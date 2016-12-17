@@ -16,5 +16,5 @@ func main() {
 	/*logs.SetLogger(logs.AdapterFile, `{"filename":"/tmp/app_finder.log","level":7,"maxlines":0,"maxsize":0,"daily":true,"maxdays":7}`)
 	 */
 
-	beego.Run()
+	beego.Run(":5001")
 }

@@ -31,6 +31,7 @@ func init() {
 			),
 		),
 	)*/
+	beego.BConfig.RunMode = "prod"
 	ns := beego.NewNamespace("/apple",
 		beego.NSInclude(
 			&controllers.AppleController{},
