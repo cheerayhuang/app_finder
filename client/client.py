@@ -2,13 +2,14 @@ import argparse
 import requests
 import sys
 import time
+import types
 
 try:
     import xml.etree.cElementTree as ET
 except ImportError:
     import xml.etree.ElementTree as ET
 
-URL = 'http://localhost:5001/apple/'
+URL = 'http://test.sdkbox:5001/apple/'
 
 def find(args):
     ns = {'ss': 'urn:schemas-microsoft-com:office:spreadsheet'}
@@ -18,11 +19,15 @@ def find(args):
     for elem in tree.iterfind('ss:Worksheet/ss:Table/ss:Row', ns):
         for data in elem.iterfind('ss:Cell/ss:Data', ns):
             text = data.text
-            if not text.isdigit():
-                r = requests.get(URL + text)
-                print r.json()
-                sys.stdout.flush()
-                time.sleep(3)
+            if type(text) is types.StringType and not text.isdigit():
+                try:
+                    r = requests.get(URL + text, timeout=10)
+                except Exception as e:
+                    continue
+                r_map = r.json()
+                print r_map
+                if 'http_count' in r_map or 'err' in r_map:
+                    time.sleep(3)
 
 def main():
     project_name = 'client'
