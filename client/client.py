@@ -9,7 +9,8 @@ try:
 except ImportError:
     import xml.etree.ElementTree as ET
 
-URL = 'http://test.sdkbox:5001/apple/'
+URL_APPLE = 'http://localhost:5001/apple/'
+URL_GOOGLE = 'http://localhost:5001/google/'
 
 def find(args):
     ns = {'ss': 'urn:schemas-microsoft-com:office:spreadsheet'}
@@ -19,15 +20,28 @@ def find(args):
     for elem in tree.iterfind('ss:Worksheet/ss:Table/ss:Row', ns):
         for data in elem.iterfind('ss:Cell/ss:Data', ns):
             text = data.text
+            not_access_api = False
+            t1 = time.time()
             if type(text) is types.StringType and not text.isdigit():
+                text = text.lower()
                 try:
-                    r = requests.get(URL + text, timeout=10)
-                except Exception as e:
+                    r = requests.get(URL_APPLE + text, timeout=10)
+                except requests.exceptions.Timeout:
                     continue
                 r_map = r.json()
-                print r_map
-                if 'http_count' in r_map or 'err' in r_map:
-                    time.sleep(3)
+                if 'not_access_apple_api' in r_map:
+                    not_access_api = True
+                if 'err' in r_map or r_map[text] == "not found":
+                    try:
+                        r = requests.get(URL_GOOGLE + text, timeout=10)
+                    except requests.exceptions.Timeout:
+                        continue
+                print r.text
+                diff = time.time() - t1 - 3;
+                if diff > 0 and not not_access_api:
+                    time.sleep(round(diff))
+
+
 
 def main():
     project_name = 'client'
