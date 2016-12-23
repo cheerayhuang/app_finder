@@ -1,4 +1,5 @@
 import argparse
+import math
 import requests
 import sys
 import time
@@ -39,7 +40,7 @@ def find(args):
                 print r.text
                 diff = time.time() - t1 - 3;
                 if diff > 0 and not not_access_api:
-                    time.sleep(round(diff))
+                    time.sleep(math.ceil(diff))
 
 
 
