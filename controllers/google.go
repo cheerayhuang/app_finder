@@ -5,14 +5,14 @@ import (
 	"github.com/astaxie/beego"
 )
 
-type AppleController struct {
+type GoogleController struct {
 	beego.Controller
 }
 
 // @router /:id(.+) [get]
-func (this *AppleController) Lookup() {
+func (this *GoogleController) Lookup() {
 	bundleId := this.Ctx.Input.Param(":id")
 
-	this.Data["json"] = models.AppleLookup(bundleId)
+	this.Data["json"] = models.GoogleLookup(bundleId)
 	this.ServeJSON()
 }

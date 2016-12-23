@@ -38,4 +38,11 @@ func init() {
 		),
 	)
 	beego.AddNamespace(ns)
+
+	ns = beego.NewNamespace("/google",
+		beego.NSInclude(
+			&controllers.GoogleController{},
+		),
+	)
+	beego.AddNamespace(ns)
 }

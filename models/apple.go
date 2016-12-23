@@ -34,24 +34,9 @@ const (
 	LOOKUP_URL = "https://itunes.apple.com/lookup"
 )
 
-var HttpCount int64 = 0
-
-type SearchParams struct {
-	Term    string `json:"term"`
-	Country string `json:"country"`
-	Limit   int    `json:"limit"`
-}
-
-type SearchReply struct {
-}
-
-func AppleSearch(params SearchParams) (r map[string]string) {
-
-	return map[string]string{"ok": "tbd"}
-
-}
-
 func AppleLookup(bundleId string) map[string]string {
+
+	logs.Debug("bundleId:", bundleId)
 
 	if _, ok := mysql.(*db.DBase); !ok {
 		Init()
@@ -89,7 +74,7 @@ func AppleLookup(bundleId string) map[string]string {
 			return map[string]string{"bundleId": bundleId, "err": err.Error()}
 		}
 		logs.Debug("The apple app is already exist in mysql")
-		return map[string]string{bundleId: strconv.FormatInt(id, 10)}
+		return map[string]string{bundleId: strconv.FormatInt(id, 10), "not_access_apple_api": "1"}
 	}
 
 	// dont found in mysql, lockup via apple API and then insert to mysql.
@@ -111,13 +96,14 @@ func AppleLookup(bundleId string) map[string]string {
 	}
 
 	if js.Get("resultCount").MustInt() == 0 {
-		return map[string]string{"bundleId": bundleId, "err": "not found"}
+		return map[string]string{bundleId: "not found"}
 	}
 
 	c, err := _GetPropertFromJson(js.Get("results").GetIndex(0))
 	if err != nil {
 		return map[string]string{"bundleId": bundleId, "err": err.Error()}
 	}
+	// field "blob"
 	c = append(c, body)
 
 	_, err = mysql.Insert(c...)
@@ -125,9 +111,7 @@ func AppleLookup(bundleId string) map[string]string {
 		return map[string]string{"bundleId": bundleId, "err": err.Error()}
 	}
 
-	HttpCount++
-
-	return map[string]string{bundleId: strconv.FormatInt(c[0].(int64), 10), "http_count": strconv.FormatInt(HttpCount, 10)}
+	return map[string]string{bundleId: strconv.FormatInt(c[0].(int64), 10)}
 }
 
 func _GetPropertFromJson(js *simplejson.Json) ([]interface{}, error) {
