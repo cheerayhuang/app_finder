@@ -17,6 +17,8 @@ def find(args):
     ns = {'ss': 'urn:schemas-microsoft-com:office:spreadsheet'}
     tree = ET.ElementTree(file=args.xml)
 
+    total_bundleid = 0
+    total_not_found = 0
     d = tree.find('ss:Worksheet/ss:Table/ss:Row/ss:Cell/ss:Data', ns)
     for elem in tree.iterfind('ss:Worksheet/ss:Table/ss:Row', ns):
         for data in elem.iterfind('ss:Cell/ss:Data', ns):
@@ -25,6 +27,7 @@ def find(args):
             t1 = time.time()
             if type(text) is types.StringType and not text.isdigit():
                 text = text.lower()
+                total_bundleid += 1
                 try:
                     r = requests.get(URL_APPLE + text, timeout=10)
                 except requests.exceptions.Timeout:
@@ -38,9 +41,13 @@ def find(args):
                     except requests.exceptions.Timeout:
                         continue
                 print r.text
-                diff = time.time() - t1 - 3;
-                if diff < 0 and not not_access_api:
-                    time.sleep(math.ceil(-diff))
+                if r.json()[text] == "not found":
+                    total_not_found += 1
+                #diff = time.time() - t1 - 3;
+                #if diff < 0 and not not_access_api:
+                #    time.sleep(math.ceil(-diff))
+    print 'total: ' + str(total_bundleid)
+    print 'total for "not found": ' + str(total_not_found)
 
 
 
