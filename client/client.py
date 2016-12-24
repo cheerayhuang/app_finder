@@ -39,8 +39,8 @@ def find(args):
                         continue
                 print r.text
                 diff = time.time() - t1 - 3;
-                if diff > 0 and not not_access_api:
-                    time.sleep(math.ceil(diff))
+                if diff < 0 and not not_access_api:
+                    time.sleep(math.ceil(-diff))
 
 
 
