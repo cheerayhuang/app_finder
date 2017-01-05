@@ -58,7 +58,7 @@ func AppleLookup(bundleId string) map[string]string {
 		"trackContentRating",
 		"averageUserRating",
 		"userRatingCount",
-		"blob",
+		//"blob",
 	}
 	mysql.(*db.DBase).SetDefaultFields(fields)
 

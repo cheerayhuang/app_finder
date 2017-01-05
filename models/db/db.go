@@ -15,7 +15,7 @@ import (
 )
 
 type DB interface {
-	Query([]string, int64, int64) (*sql.Rows, error)
+	Query([]string) (*sql.Rows, error)
 	QueryID(string, string) (int64, error)
 	Insert(...interface{}) (int64, error)
 	Delete()
@@ -97,7 +97,7 @@ func (this *DBase) SetDefaultFields(fields []string) {
 	copy(this.fields, fields)
 }
 
-func (this *DBase) Query(fields []string, limit, offset int64) (*sql.Rows, error) {
+func (this *DBase) Query(fields []string) (*sql.Rows, error) {
 	if fields == nil || len(fields) == 0 {
 		if this.fields != nil && len(this.fields) != 0 {
 			fields = this.fields
@@ -106,7 +106,7 @@ func (this *DBase) Query(fields []string, limit, offset int64) (*sql.Rows, error
 		}
 	}
 
-	stat, err := this.QueryStat(fields, limit, offset)
+	stat, err := this.QueryStat(fields)
 	if err != nil {
 		return nil, err
 	}
@@ -205,7 +205,7 @@ func (this *DBase) Close() error {
 	return this.db.Close()
 }
 
-func (this *DBase) QueryStat(fields []string, limit, offset int64) (string, error) {
+func (this *DBase) QueryStat(fields []string) (string, error) {
 	if len(fields) == 0 {
 		return "", MyErr.New(MyErr.DB_QUERY_MISS_PARAMS, "query fields are empty")
 	}
@@ -216,14 +216,8 @@ func (this *DBase) QueryStat(fields []string, limit, offset int64) (string, erro
 	}
 
 	select_stat := "SELECT " + strings.Join(fields_str, ",") + " FROM " + this.table
-	where_stat := ""
-	limit_stat := ""
-	if this.d == "postgres" {
-		//where_stat = " WHERE timestamp >= " + strconv.FormatInt(this.tm_start, 10) + " AND timestamp <= " + strconv.FormatInt(this.tm_end, 10)
-		limit_stat = " LIMIT " + strconv.FormatInt(limit, 10) + " OFFSET " + strconv.FormatInt(offset, 10)
-	}
 
-	return select_stat + where_stat + limit_stat, nil
+	return select_stat, nil
 }
 
 func (this *DBase) _CalcDuration(now *time.Time) error {

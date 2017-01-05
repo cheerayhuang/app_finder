@@ -45,4 +45,12 @@ func init() {
 		),
 	)
 	beego.AddNamespace(ns)
+
+	ns = beego.NewNamespace("/notfound",
+		beego.NSInclude(
+			&controllers.NotfoundController{},
+		),
+	)
+	beego.AddNamespace(ns)
+
 }

@@ -20,4 +20,11 @@ func init() {
 			AllowHTTPMethods: []string{"get"},
 			Params: nil})
 
+	beego.GlobalControllerRouter["app_finder/controllers:NotfoundController"] = append(beego.GlobalControllerRouter["app_finder/controllers:NotfoundController"],
+		beego.ControllerComments{
+			Method: "Notfound",
+			Router: `/:id(.*)`,
+			AllowHTTPMethods: []string{"post"},
+			Params: nil})
+
 }
