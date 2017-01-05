@@ -70,12 +70,12 @@ func New(db, user, pwd, database, host, port string, now *time.Time) (DB, error)
 	r.table = "event_log"
 	r.fields = []string{"sdkbox_app_package_id", "sdkbox_platform", "sdkbox_country_code", "sdkbox_sdkboxversion", "sdkbox_app", "sdkbox_event", "timestamp"}
 
-	if r.d == "postgres" {
+	/*if r.d == "postgres" {
 		err = r._CalcDuration(now)
 		if err != nil {
 			return nil, err
 		}
-	}
+	}*/
 
 	return r, nil
 }
@@ -121,7 +121,7 @@ func (this *DBase) Query(fields []string, limit, offset int64) (*sql.Rows, error
 
 func (this *DBase) QueryID(where_f, where_v string) (int64, error) {
 	var id int64
-	s := "SELECT id FROM " + this.table + " WHERE `" + where_f + "` = '" + where_v + "'"
+	s := "SELECT id FROM " + this.table + " WHERE " + where_f + " = '" + where_v + "'"
 	logs.Debug(s)
 	err := this.db.QueryRow(s).Scan(&id)
 	if err != nil {
@@ -143,7 +143,7 @@ func (this *DBase) Count() (int64, error) {
 
 func (this *DBase) Exist(field, value string) (bool, error) {
 	var count int
-	s := "SELECT COUNT(*) FROM " + this.table + " WHERE `" + field + "` = '" + value + "'"
+	s := "SELECT COUNT(*) FROM " + this.table + " WHERE " + field + " = '" + value + "'"
 	logs.Debug(s)
 	err := this.db.QueryRow(s).Scan(&count)
 	if err != nil {
@@ -181,6 +181,7 @@ func (this *DBase) Insert(args ...interface{}) (int64, error) {
 	}
 	marks_str := strings.Join(marks, ",")
 	stmt_str := "INSERT INTO " + this.table + " VALUES(" + marks_str + ")"
+	//logs.Debug(stmt_str)
 	stmt, err := this.db.Prepare(stmt_str)
 	if err != nil {
 		return 0, err

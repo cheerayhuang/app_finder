@@ -15,17 +15,16 @@ var mysql db.DB
 
 func Init() {
 	var err error
-	mysql, err = db.New("mysql",
-		"sdkbox",
-		"1234",
-		"apple_google_apps",
-		"localhost",
-		"3306",
+	mysql, err = db.New("postgres",
+		"awsuser",
+		"678D9ed29db6",
+		"events",
+		"sdkbox.crzhtaa6feqd.us-west-2.redshift.amazonaws.com",
+		"5439",
 		nil,
 	)
 	if err != nil {
-		//return map[string]string{"err": err.Error()}
-		logs.Error("create mysql object failed")
+		logs.Error("create mysql object failed: ", err.Error())
 	}
 }
 
@@ -104,7 +103,7 @@ func AppleLookup(bundleId string) map[string]string {
 		return map[string]string{"bundleId": bundleId, "err": err.Error()}
 	}
 	// field "blob"
-	c = append(c, body)
+	//c = append(c, body)
 
 	_, err = mysql.Insert(c...)
 	if err != nil {

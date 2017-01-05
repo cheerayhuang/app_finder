@@ -5,7 +5,7 @@ import (
 
 	"io/ioutil"
 	"net/http"
-	"net/url"
+	//"net/url"
 	"regexp"
 	"strconv"
 	"strings"
@@ -61,12 +61,13 @@ func GoogleLookup(bundleId string) map[string]string {
 
 	// dont found in mysql, lockup via apple API and then insert to mysql.
 	logs.Debug("find this app via crawling google play...")
-	proxy := func(_ *http.Request) (*url.URL, error) {
+	/*proxy := func(_ *http.Request) (*url.URL, error) {
 		return url.Parse("http://127.0.0.1:1085")
 	}
 	transport := &http.Transport{Proxy: proxy}
 	client := &http.Client{Transport: transport}
-	r, err := client.Get(GOOGLE_PLAY_URL + bundleId)
+	r, err := client.Get(GOOGLE_PLAY_URL + bundleId)*/
+	r, err := http.Get(GOOGLE_PLAY_URL + bundleId)
 	if err != nil {
 		return map[string]string{"bundleId": bundleId, "err": err.Error()}
 	}
@@ -107,7 +108,11 @@ func _GraspContent(reg string, body []byte, t string) interface{} {
 	res := re.FindSubmatch(body)
 	if res == nil {
 		logs.Error("can not match regexp: %q.", reg)
-		return string("")
+		if t == "str" {
+			return string("")
+		} else {
+			return 0
+		}
 	}
 
 	switch t {
