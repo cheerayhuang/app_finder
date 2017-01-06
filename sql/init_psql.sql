@@ -1,7 +1,7 @@
 CREATE TABLE apple_store_app (
     id bigint NOT NULL,
-    bundleId varchar(64) NOT NULL,
-    trackCensoredName varchar(128) NOT NULL,
+    bundleId varchar(256) NOT NULL,
+    trackCensoredName varchar(256) NOT NULL,
     trackViewUrl varchar(256) NOT NULL,
     genre1 varchar(64) NOT NULL,
     genre2 varchar(64) NOT NULL,
@@ -19,8 +19,8 @@ CREATE TABLE apple_store_app (
 );
 
 CREATE TABLE google_play_app (
-    bundleId varchar(64) NOT NULL,
-    trackCensoredName varchar(128) NOT NULL,
+    bundleId varchar(256) NOT NULL,
+    trackCensoredName varchar(256) NOT NULL,
     trackViewUrl varchar(256) NOT NULL,
     genre varchar(64) NOT NULL,
     artistName varchar(128) NOT NULL,
@@ -30,10 +30,5 @@ CREATE TABLE google_play_app (
     id bigint NOT NULL,
     currency varchar(8) NOT NULL,
     price real NOT NULL,
-    PRIMARY KEY(bundleId)
-);
-
-CREATE TABLE not_found_app (
-    bundleId varchar(64) NOT NULL,
     PRIMARY KEY(bundleId)
 );

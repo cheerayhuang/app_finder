@@ -43,7 +43,7 @@ func Notfound(bundleId string) map[string]string {
 		res, err := _ReplyNotfoundList()
 		if err != nil {
 			logs.Error("Get Notfound list falied: %s", err.Error())
-			return nil
+			return map[string]string{"err": "Get Notfound list failed"}
 		}
 		return res
 
@@ -52,7 +52,7 @@ func Notfound(bundleId string) map[string]string {
 		err := _StoreBundleId(bundleId)
 		if err != nil {
 			logs.Error("Store notfound bundleId failed: %s", err.Error())
-			return nil
+			return map[string]string{"bundleId": bundleId, "err": "Store notfound bundleId failed"}
 		}
 		return map[string]string{bundleId: "store to Notfound table"}
 	}
@@ -68,7 +68,7 @@ func NotfoundDelete(bundleId string) map[string]string {
 	err := mysqlNotfound.Delete("bundleId", bundleId)
 	if err != nil {
 		logs.Error("Delete bundleId from Notfound table failed: %s", err.Error())
-		return map[string]string{bundleId: "delete from Notfound table failed"}
+		return map[string]string{"bundleId": bundleId, "err": "delete from Notfound table failed"}
 	}
 
 	return map[string]string{bundleId: "delete from Notfound table"}
