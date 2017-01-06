@@ -38,7 +38,7 @@ def refind_not_found():
             print r.text
             continue
 
-        r = requests.delete(URL_APPLE + k)
+        r = requests.delete(URL_NOT_FOUND + k)
         print r.text
 
 
