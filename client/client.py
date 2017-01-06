@@ -12,8 +12,38 @@ except ImportError:
 
 URL_APPLE = 'http://localhost:5001/apple/'
 URL_GOOGLE = 'http://localhost:5001/google/'
+URL_NOT_FOUND = 'http://localhost:5001/notfound/'
+
+def refind_not_found():
+    print 'find bundleId from Notfound table first...'
+    r = requests.post(URL_NOT_FOUND)
+    l = r.json()
+
+    for k in l:
+        try:
+            r = requests.get(URL_APPLE + k, timeout=10)
+        except Exception:
+            time.sleep(1)
+            continue
+
+        r_map = r.json()
+        if 'err' in r_map or r_map[k] == "not found":
+            try:
+                r = requests.get(URL_GOOGLE + k, timeout=10)
+            except Exception:
+                continue
+
+        r_map = r.json()
+        if 'err' in r_map or r_map[k] == "not found":
+            print r.text
+            continue
+
+        r = requests.delete(URL_APPLE + k)
+        print r.text
+
 
 def find(args):
+    print 'find bundleId from xml file: {0}...'.format(args.xml)
     ns = {'ss': 'urn:schemas-microsoft-com:office:spreadsheet'}
     tree = ET.ElementTree(file=args.xml)
 
@@ -42,13 +72,15 @@ def find(args):
                         r = requests.get(URL_GOOGLE + text, timeout=10)
                     except Exception:
                         continue
-                print r.text
 
                 if text in r.json() and r.json()[text] == "not found":
                     total_not_found += 1
+                    r = requests.post(URL_NOT_FOUND + text)
 
                 if 'err' in r.json():
                     total_err += 1
+
+                print r.text
 
                 diff = time.time() - t1 - 3;
                 #if diff < 0 and not not_access_api:
@@ -68,6 +100,8 @@ def main():
 
     args = parser.parse_args()
 
+    refind_not_found()
+    time.sleep(5)
     find(args)
 
 if __name__ == '__main__':
