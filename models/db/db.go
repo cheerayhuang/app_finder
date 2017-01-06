@@ -18,7 +18,7 @@ type DB interface {
 	Query([]string) (*sql.Rows, error)
 	QueryID(string, string) (int64, error)
 	Insert(...interface{}) (int64, error)
-	Delete()
+	Delete(string, string) error
 	Update()
 	Count() (int64, error)
 	Exist(string, string) (bool, error)
@@ -157,8 +157,22 @@ func (this *DBase) Exist(field, value string) (bool, error) {
 	return false, nil
 }
 
-func (this *DBase) Delete() {
+func (this *DBase) Delete(field, value string) error {
+	stmt_str := "DELETE FROM " + this.table + " WHERE " + field + " = " + "'" + value + "'"
+	logs.Debug(stmt_str)
 
+	stmt, err := this.db.Prepare(stmt_str)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (this *DBase) Update() {

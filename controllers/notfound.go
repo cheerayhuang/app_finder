@@ -16,3 +16,11 @@ func (this *NotfoundController) Notfound() {
 	this.Data["json"] = models.Notfound(bundleId)
 	this.ServeJSON()
 }
+
+// @router /:id(.+) [delete]
+func (this *NotfoundController) NotfoundDelete() {
+	bundleId := this.Ctx.Input.Param(":id")
+
+	this.Data["json"] = models.NotfoundDelete(bundleId)
+	this.ServeJSON()
+}

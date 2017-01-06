@@ -27,4 +27,11 @@ func init() {
 			AllowHTTPMethods: []string{"post"},
 			Params: nil})
 
+	beego.GlobalControllerRouter["app_finder/controllers:NotfoundController"] = append(beego.GlobalControllerRouter["app_finder/controllers:NotfoundController"],
+		beego.ControllerComments{
+			Method: "NotfoundDelete",
+			Router: `/:id(.+)`,
+			AllowHTTPMethods: []string{"delete"},
+			Params: nil})
+
 }

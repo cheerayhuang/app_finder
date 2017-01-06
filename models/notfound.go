@@ -58,6 +58,22 @@ func Notfound(bundleId string) map[string]string {
 	}
 }
 
+func NotfoundDelete(bundleId string) map[string]string {
+	if _, ok := mysqlNotfound.(*db.DBase); !ok {
+		InitNotFound()
+	}
+
+	mysqlNotfound.(*db.DBase).SetDefaultTable("not_found_app")
+
+	err := mysqlNotfound.Delete("bundleId", bundleId)
+	if err != nil {
+		logs.Error("Delete bundleId from Notfound table failed: %s", err.Error())
+		return map[string]string{bundleId: "delete from Notfound table failed"}
+	}
+
+	return map[string]string{bundleId: "delete from Notfound table"}
+}
+
 func _ReplyNotfoundList() (map[string]string, error) {
 	rows, err := mysqlNotfound.Query(nil)
 	if err != nil {
