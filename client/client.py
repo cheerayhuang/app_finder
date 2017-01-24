@@ -17,18 +17,17 @@ URL_NOT_FOUND = 'http://localhost:5001/notfound/'
 
 
 DAY = 24*3600
-CMD = 'psql -h sdkbox.crzhtaa6feqd.us-west-2.redshift.amazonaws.com -p 5439 "user=awsuser password=678D9ed29db6 dbname=events" < /tmp/tmp.sql'
+CMD = ['psql', '-h', 'sdkbox.crzhtaa6feqd.us-west-2.redshift.amazonaws.com', '-p', '5439', 'user=awsuser password=678D9ed29db6 dbname=events']
 
 SQL = '''
 \o /tmp/out.txt;
 select distinct sdkbox_app_package_id
 from event_log
-where timestamp > extract(epoch from '2016-12-13'::date) and timestamp < extract(epoch from '2016-12-14'::date)
-limit 10;
+where timestamp > extract(epoch from '2016-12-13'::date) and timestamp < extract(epoch from '2016-12-14'::date);
 '''
 
 def print_log(s):
-    print time.strftime('[%Y-%m-%d %H:%M:%S]', time.localtime()) + s
+    print time.strftime('[%Y-%m-%d %H:%M:%S] ', time.localtime()) + s
     sys.stdout.flush()
 
 
@@ -82,29 +81,31 @@ def refind_not_found():
 def find(start, end):
     f = '/tmp/out-' + start + '.txt'
     print_log('execute query, generate result into {0}...'.format(f))
-    '''
-    r = subporcess.call(CMD)
+
+    sql_file = open('/tmp/tmp.sql', 'r')
+    r = subprocess.call(CMD, stdin=sql_file)
     if r != 0:
         print_log('execute query failed')
         sys.exit(1)
+    sql_file.close()
 
-    '''
     print_log('find bundleId from file: {0}...'.format(f))
     in_file = open(f, 'r')
     lines = in_file.readlines()
     in_file.close()
 
     # trim "filed name" and "(x) rows".
-    lines = lines[2:-1]
+    lines = lines[2:-2]
 
     total_bundleid = 0
     total_not_found = 0
     total_err = 0
-    for text in lines:
+    for line in lines:
+        text = line.strip(" \n")
         not_access_api = False
         t1 = time.time()
-        if type(text) is types.StringType and not text.isdigit():
-            text = text.lower()
+        if type(text) is types.StringType and not text.isdigit() and text != '':
+            #text = text.lower()
             total_bundleid += 1
             try:
                 r = requests.get(URL_APPLE + text, timeout=10)
@@ -148,10 +149,16 @@ def main():
     args = parser.parse_args()
     '''
 
-    start, end = get_time()
-    refind_not_found()
-    time.sleep(5)
-    find(start, end)
+    while (True):
+        t1 = time.time()
+        start, end = get_time()
+        refind_not_found()
+        time.sleep(5)
+        find(start, end)
+        t2 = time.time()
+        if t2-t1 < DAY:
+            time.sleep(DAY-t2+t1)
+
 
 if __name__ == '__main__':
 
